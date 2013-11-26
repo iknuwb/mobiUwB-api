@@ -29,9 +29,9 @@ ini_set('display_errors', 1);
 * Konfiguracja usługi internetowej.
 */
 function configure() {
-	option('env', ENV_DEVELOPMENT); /* zmienić w produkcyjnej */
-	$serwisy_json = file_get_contents('serwisy_ii.json');
-	option('serwisy', json_decode($serwisy_json, true));
+    option('env', ENV_DEVELOPMENT); /* zmienić w produkcyjnej */
+    $serwisy_json = file_get_contents('serwisy_ii.json');
+    option('serwisy', json_decode($serwisy_json, true));
 }
 
 /**
@@ -42,12 +42,12 @@ function configure() {
 * Funkcja wywołuje się przed innymi.
 */
 function before($route) {
-	header('Allow: GET, HEAD');
-	$expires = 180; /* cache na 3 min */
-	header('Pragma: public');
-	header('Cache-Control: maxage='.$expires);
-	header('Expires: ' . gmdate('D, d M Y H:i:s', time()+$expires) . ' GMT');
-	header('Access-Control-Allow-Origin: *');
+    header('Allow: GET, HEAD');
+    $expires = 180; /* cache na 3 min */
+    header('Pragma: public');
+    header('Cache-Control: maxage='.$expires);
+    header('Expires: ' . gmdate('D, d M Y H:i:s', time()+$expires) . ' GMT');
+    header('Access-Control-Allow-Origin: *');
 }
 
 dispatch('/', 'index');
@@ -58,12 +58,12 @@ dispatch('/', 'index');
 *
 * Funkcja przekierowuje na domyślny serwis w JSON.
 */
-	function index() {
-		$host = $_SERVER['HTTP_HOST'];
-		$uri = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
-		header("Location: http://$host$uri/?/json/io");
-		exit;
-	}
+    function index() {
+        $host = $_SERVER['HTTP_HOST'];
+        $uri = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+        header("Location: http://$host$uri/?/json/io");
+        exit;
+    }
 
 /**
 * \brief Zwróć błąd
@@ -73,9 +73,9 @@ dispatch('/', 'index');
 * Funkcja zwraca obiekt błędu.
 */
 function blad($s) {
-	$tmp = new StdClass();
-	$tmp->blad = $s;
-	return $tmp;
+    $tmp = new StdClass();
+    $tmp->blad = $s;
+    return $tmp;
 }
 
 /**
@@ -86,57 +86,57 @@ function blad($s) {
 * Funkcja pobiera dane serwisu w formacie JSON.
 */
 function pobierz_dane($serwis, $limit, $offset) {
-	$serwis = (string) $serwis;
-	$limit = (int) $limit;
-	$offset = (int) $offset;
+    $serwis = (string) $serwis;
+    $limit = (int) $limit;
+    $offset = (int) $offset;
 
-	option('serwis', $serwis);
-	$serwisy = option('serwisy');
+    option('serwis', $serwis);
+    $serwisy = option('serwisy');
 
-	if (empty($serwis)) {
-		header('HTTP/1.1 410 Gone');
-		return blad('Wybierz serwis');
-	}
+    if (empty($serwis)) {
+        header('HTTP/1.1 410 Gone');
+        return blad('Wybierz serwis');
+    }
 
-	if (!array_key_exists($serwis, option('serwisy'))) {
-		header('HTTP/1.1 404 Not Found');
-		return blad('Niepoprawny serwis');
-	}
+    if (!array_key_exists($serwis, option('serwisy'))) {
+        header('HTTP/1.1 404 Not Found');
+        return blad('Niepoprawny serwis');
+    }
 
-	option('serwis_nazwa', $serwisy[$serwis]);
+    option('serwis_nazwa', $serwisy[$serwis]);
 
-	$json = file_get_contents('http://ii.uwb.edu.pl/api/json.php?'.$serwis);
+    $json = file_get_contents('http://ii.uwb.edu.pl/api/json.php?'.$serwis);
 
-	if ($json === false) {
-		header('HTTP/1.1 502 Bad Gateway');
-		return blad('Brak odpowiedzi z API');
-	}
+    if ($json === false) {
+        header('HTTP/1.1 502 Bad Gateway');
+        return blad('Brak odpowiedzi z API');
+    }
 
-	$dane = json_decode($json);
+    $dane = json_decode($json);
 
-	if ($dane === null) {
-		header('HTTP/1.1 502 Bad Gateway');
-		return blad('Błędna odpowiedź z API');
-	}
+    if ($dane === null) {
+        header('HTTP/1.1 502 Bad Gateway');
+        return blad('Błędna odpowiedź z API');
+    }
 
-	if (abs($offset) > count($dane)) {
-		header('HTTP/1.1 400 Bad Request');
-		return blad('Niepoprawny offset');
-	}
+    if (abs($offset) > count($dane)) {
+        header('HTTP/1.1 400 Bad Request');
+        return blad('Niepoprawny offset');
+    }
 
-	if ($limit === 0) {
-		$limit = null;
-	}
+    if ($limit === 0) {
+        $limit = null;
+    }
 
-	return array_slice($dane, $offset, $limit);
+    return array_slice($dane, $offset, $limit);
 }
 
 class MyDOMDocument extends DOMDocument {
-	public function __construct() {
-		parent::__construct();
-		$this->formatOutput = true;
-		$this->preserveWhiteSpace = false;
-	}
+    public function __construct() {
+        parent::__construct();
+        $this->formatOutput = true;
+        $this->preserveWhiteSpace = false;
+    }
 }
 
 /**
@@ -147,23 +147,23 @@ class MyDOMDocument extends DOMDocument {
 * Funkcja przekształca pobrane dane na XML.
 */
 function konstruuj_xml($dane) {
-	$xml = new MyDOMDocument();
+    $xml = new MyDOMDocument();
 
-	if (is_array($dane)) {
-		$root = $xml->appendChild($xml->createElement('serwis'));
+    if (is_array($dane)) {
+        $root = $xml->appendChild($xml->createElement('serwis'));
 
-		foreach ($dane as $sekcja) {
-			$sekcjaXML = $root->appendChild($xml->createElement('sekcja'));
-			$sekcjaXML->appendChild($xml->createElement('tytul', $sekcja->tytul));
-			$tresc = $sekcjaXML->appendChild($xml->createElement('tresc'));
-			$tresc->appendChild($xml->createCDATASection($sekcja->tresc));
-			$sekcjaXML->appendChild($xml->createElement('data', $sekcja->data));
-		}
-	} else {
-		$xml->appendChild($xml->createElement('blad', $dane->blad));
-	}
+        foreach ($dane as $sekcja) {
+            $sekcjaXML = $root->appendChild($xml->createElement('sekcja'));
+            $sekcjaXML->appendChild($xml->createElement('tytul', $sekcja->tytul));
+            $tresc = $sekcjaXML->appendChild($xml->createElement('tresc'));
+            $tresc->appendChild($xml->createCDATASection($sekcja->tresc));
+            $sekcjaXML->appendChild($xml->createElement('data', $sekcja->data));
+        }
+    } else {
+        $xml->appendChild($xml->createElement('blad', $dane->blad));
+    }
 
-	return $xml->saveXML();
+    return $xml->saveXML();
 }
 
 /**
@@ -176,37 +176,37 @@ function konstruuj_xml($dane) {
 * Funkcja przekształca pobrane dane na Atom.
 */
 function konstruuj_atom($dane) {
-	$xml = new MyDOMDocument();
+    $xml = new MyDOMDocument();
 
-	if (is_array($dane)) {
-		$root = $xml->appendChild($xml->createElementNS('http://www.w3.org/2005/Atom', 'feed'));
-		$root->appendChild($xml->createElement('title', 'Instytut Informatyki UwB --- '.option('serwis_nazwa')));
-		$link = $root->appendChild($xml->createElement('link'));
-		$link->setAttribute('rel', 'self');
-		$link->setAttribute('type', 'application/atom+xml');
-		$link->setAttribute('href', "http://$_SERVER[SERVER_NAME]$_SERVER[REQUEST_URI]");
-		$root->appendChild($xml->createElement('id', 'tag:ii.uwb.edu.pl,2013:'.option('serwis')));
-		if (array_key_exists(0, $dane))
-			$updated = $dane[0]->data;
-		else
-			$updated = '1970-01-01T00:00:00Z';
-		$root->appendChild($xml->createElement('updated', $updated));
-		$root->appendChild($xml->createElement('author'))
-			->appendChild($xml->createElement('name', 'Instytut Informatyki'));
+    if (is_array($dane)) {
+        $root = $xml->appendChild($xml->createElementNS('http://www.w3.org/2005/Atom', 'feed'));
+        $root->appendChild($xml->createElement('title', 'Instytut Informatyki UwB --- '.option('serwis_nazwa')));
+        $link = $root->appendChild($xml->createElement('link'));
+        $link->setAttribute('rel', 'self');
+        $link->setAttribute('type', 'application/atom+xml');
+        $link->setAttribute('href', "http://$_SERVER[SERVER_NAME]$_SERVER[REQUEST_URI]");
+        $root->appendChild($xml->createElement('id', 'tag:ii.uwb.edu.pl,2013:'.option('serwis')));
+        if (array_key_exists(0, $dane))
+            $updated = $dane[0]->data;
+        else
+            $updated = '1970-01-01T00:00:00Z';
+        $root->appendChild($xml->createElement('updated', $updated));
+        $root->appendChild($xml->createElement('author'))
+            ->appendChild($xml->createElement('name', 'Instytut Informatyki'));
 
-		foreach ($dane as $sekcja) {
-			$entry = $root->appendChild($xml->createElement('entry'));
-			$entry->appendChild($xml->createElement('title', $sekcja->tytul));
-			$entry->appendChild($xml->createElement('updated', $sekcja->data));
-			$content = $entry->appendChild($xml->createElement('content'));
-			$content->setAttribute('type', 'html');
-			$content->appendChild($xml->createTextNode($sekcja->tresc));
-		}
-	} else {
-		$xml->appendChild($xml->createElement('blad', $dane->blad));
-	}
+        foreach ($dane as $sekcja) {
+            $entry = $root->appendChild($xml->createElement('entry'));
+            $entry->appendChild($xml->createElement('title', $sekcja->tytul));
+            $entry->appendChild($xml->createElement('updated', $sekcja->data));
+            $content = $entry->appendChild($xml->createElement('content'));
+            $content->setAttribute('type', 'html');
+            $content->appendChild($xml->createTextNode($sekcja->tresc));
+        }
+    } else {
+        $xml->appendChild($xml->createElement('blad', $dane->blad));
+    }
 
-	return $xml->saveXML();
+    return $xml->saveXML();
 }
 
 dispatch('/xml/:serwis/:limit/:offset', 'serwuj_xml');
@@ -218,10 +218,10 @@ dispatch('/xml/:serwis/:limit/:offset', 'serwuj_xml');
 *
 * Funkcja serwuje XML-a.
 */
-	function serwuj_xml($serwis, $limit, $offset) {
-		header('Content-Type: application/xml; charset=utf-8');
-		return konstruuj_xml(pobierz_dane($serwis, $limit, $offset));
-	}
+    function serwuj_xml($serwis, $limit, $offset) {
+        header('Content-Type: application/xml; charset=utf-8');
+        return konstruuj_xml(pobierz_dane($serwis, $limit, $offset));
+    }
 
 dispatch('/json/:serwis/:limit/:offset', 'serwuj_json');
 /**
@@ -232,10 +232,10 @@ dispatch('/json/:serwis/:limit/:offset', 'serwuj_json');
 *
 * Funkcja serwuje JSON-a.
 */
-	function serwuj_json($serwis, $limit, $offset) {
-		header('Content-Type: application/json; charset=utf-8');
-		return json_encode(pobierz_dane($serwis, $limit, $offset));
-	}
+    function serwuj_json($serwis, $limit, $offset) {
+        header('Content-Type: application/json; charset=utf-8');
+        return json_encode(pobierz_dane($serwis, $limit, $offset));
+    }
 
 dispatch('/atom/:serwis/:limit/:offset', 'serwuj_atom');
 /**
@@ -246,9 +246,9 @@ dispatch('/atom/:serwis/:limit/:offset', 'serwuj_atom');
 *
 * Funkcja serwuje Atom-a.
 */
-	function serwuj_atom($serwis, $limit, $offset) {
-		header('Content-Type: application/atom+xml; charset=utf-8');
-		return konstruuj_atom(pobierz_dane($serwis, $limit, $offset));
-	}
+    function serwuj_atom($serwis, $limit, $offset) {
+        header('Content-Type: application/atom+xml; charset=utf-8');
+        return konstruuj_atom(pobierz_dane($serwis, $limit, $offset));
+    }
 
 run();
