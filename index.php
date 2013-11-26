@@ -199,11 +199,8 @@ function konstruuj_atom($dane) {
 			$entry->appendChild($xml->createElement('title', $sekcja->tytul));
 			$entry->appendChild($xml->createElement('updated', $sekcja->data));
 			$content = $entry->appendChild($xml->createElement('content'));
-			$content->setAttribute('type', 'xhtml');
-			$xhtml = $xml->createDocumentFragment();
-			$xhtml->appendXML($sekcja->tresc);
-			$content->appendChild($xml->createElementNS('http://www.w3.org/1999/xhtml', 'div'))
-				->appendChild($xhtml);
+			$content->setAttribute('type', 'html');
+			$content->appendChild($xml->createTextNode($sekcja->tresc));
 		}
 	} else {
 		$xml->appendChild($xml->createElement('blad', $dane->blad));
