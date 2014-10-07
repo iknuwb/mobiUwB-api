@@ -2,8 +2,9 @@
 
 /*
  * Copyright © 2013 Radosław Piliszek
+ * Copyright © 2014 Łukasz Szeremeta
  * Copyright © 2013 Dominik Tomaszuk
- *
+ * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the “Software”), to deal in the Software without restriction,
  * including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -83,7 +84,9 @@ function blad($s) {
 /**
  * \brief Pobierz dane
  * \author Radosław Piliszek
+ * \author Łukasz Szeremeta
  * \date 2013-03-09
+ * \date 2014-10-07
  *
  * Funkcja pobiera dane serwisu w formacie JSON.
  */
@@ -121,7 +124,7 @@ function pobierz_dane($serwis, $limit, $offset) {
         return blad('Błędna odpowiedź z API');
     }
 
-    if (abs($offset) > count($dane)) {
+    if (abs($offset) >= count($dane)) {
         header('HTTP/1.1 400 Bad Request');
         return blad('Niepoprawny offset');
     }
