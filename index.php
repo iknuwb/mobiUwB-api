@@ -20,7 +20,7 @@
 
 error_reporting(E_ALL);
 require_once './lib/limonade.php';
-ini_set('display_errors', 1);
+ini_set('display_errors', 1); /* zmienić w produkcyjnej */
 
 /**
  * \brief Konfiguracja
